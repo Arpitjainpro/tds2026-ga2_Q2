@@ -1,49 +1,48 @@
-#!/usr/bin/env python3
-"""Flask application entry point.
+# q-git-revert-env
 
-Version: 9.0.0
-"""
-import os
-from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+A Flask-based REST API service.
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+## Version
 
-db = SQLAlchemy(app)
-jwt = JWTManager(app)
+8.0.0
 
+## Quick Start
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.now())
+```bash
+pip install -r requirements.txt
+python app.py
+```
 
+## API Endpoints
 
-@app.route('/health')
-def health():
-    """Health check endpoint."""
-    return jsonify({"status": "healthy", "version": "9.0.0"})
+- `GET /health` - Health check
+- `POST /api/v1/login` - User authentication
+- `GET /api/v1/users` - List users
+- `POST /api/v1/register` - Register new user
 
+## Environment Variables
 
-@app.route('/api/v1/login', methods=['POST'])
-def login():
-    """Authenticate user and return JWT token."""
-    data = request.get_json()
-    # Authentication logic here
-    return jsonify({"message": "Login endpoint"})
+Copy `.env.example` to `.env` and configure:
 
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET` - Secret for JWT tokens
+- `REDIS_URL` - Redis connection for caching
 
-@app.route('/api/v1/users')
-@jwt_required()
-def list_users():
-    """List all users (protected endpoint)."""
-    return jsonify({"users": []})
+## Development
 
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+flask run --debug
+```
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+## Testing
+
+```bash
+pytest tests/ -v
+```
+
+## License
+
+MIT
